@@ -633,6 +633,8 @@ main(int argc, char **argv)
     const char *config_file = DEFAULT_CONFIG_FILE;
 
 #if defined(__OpenBSD__)
+    if (unveil("/", "") == -1)
+        die();
     unveil(config_file, "r"); /* return ignored as the file may not exist */
     if (pledge("inet stdio rpath unveil", 0) == -1)
         die();
@@ -692,6 +694,11 @@ main(int argc, char **argv)
                 exit(EXIT_FAILURE);
         }
     }
+
+#if defined(__OpenBSD__)
+    if (unveil(0, 0) == -1)
+        die();
+#endif
 
     if (argv[optind]) {
         fprintf(stderr, "endlessh: too many arguments\n");
